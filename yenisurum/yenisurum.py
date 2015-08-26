@@ -113,9 +113,12 @@ class UYGULAMA(object):
         #Thread(target=self.uyari, args=("", "")).start()
         
         Thread(target=self.uyaridenetim).start()
+        Thread(target=self.guncellestirmeDenetim).start()
         
           
     def guncellestirmeDenetim(self, komut=""):
+        if komut != "":
+            showinfo(u"Güncelleþtirmeler Denetleniyor", u"Güncelleþtirmeler denetleniyor...")
         dosya = urllib.urlopen("https://raw.githubusercontent.com/millipardus/ezanvakitleri/master/surum.txt").read().strip()
         if dosya != self.surum:
             soru = askquestion(u"Yeni Bir Sürüm Var !", u"Yeni bir sürüm tespit edildi. Sürüm numarasý: %s\nYüklemek ister misiniz ?" %dosya)
@@ -124,8 +127,14 @@ class UYGULAMA(object):
                     os.startfile("guncellestir.py")
                 elif sys.argv[0].endswith(".exe"):
                     os.startfile("guncellestir.exe")
-                
                 exit()
+        elif komut != "":
+            showinfo(u"Yeni Sürüm Yok", u"Þu an güncel sürümü kullanýyorsunuz.")
+                
+                
+        if komut == "":
+            self.pencere.after(120000, self.guncellestirmeDenetim)
+        
         
         
             
@@ -149,6 +158,7 @@ class UYGULAMA(object):
         
         self.komutlar.add_command(label="Vakitleri Çek ve Kaydet", command=self.vakitcek_d)
         self.komutlar.add_command(label="Gizle", command=self.pencere_gizle)
+        self.komutlar.add_command(label=u"Güncelleþtirmeleri Denetle", command=lambda: Thread(target=self.guncellestirmeDenetim("komut")).start())
         self.dosya.add_command(label=u"Çýkýþ", command=self.cikis)
         self.ayarlar_.add_command(label=u"Seçenekler", command=self.Secenekler)
         
