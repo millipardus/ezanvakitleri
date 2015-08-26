@@ -1,2 +1,1 @@
-yenisurum.py
 kaynaklar/ezan2.mp3
