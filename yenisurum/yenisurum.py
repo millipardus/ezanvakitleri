@@ -742,7 +742,7 @@ class Veritabani(object):
         veriler = im.fetchall()
         return veriler
 
-IPUCU = 'wx Sistem Cubugu'
+IPUCU = u'Ezan Vakitleri'
 RESIM = "kaynaklar"+os.sep+'camii.png'
         
 class GCResim(wx.TaskBarIcon):
