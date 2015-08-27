@@ -1,27 +1,32 @@
 ï»¿#!/usr/bin/env python
-# -*- coding: cp1254 -*-
+# -*- coding: utf-8 -*-
 
 from Tkinter import *
-import ttk, bildirim
+import ttk, bildirim, wx
 
 from datetime import datetime
 from subprocess import check_output
 import sqlite3, os, re, urllib, time, winsound, sys
 from threading import Thread
 from tkMessageBox import *
-check_output("chcp 1254", shell=True)
+#check_output("chcp 1254", shell=True)
 from Queue import Queue
-#import pygame
-#pygame.mixer.init()
+import pygame
+pygame.mixer.init()
+
 
 class UYGULAMA(object):
     def __init__(self, pencere_):
-        self.surum = "1.0"
+        self.surum = "1.1"
+        self.gizli = 0
         self.vt = Veritabani()
         self.sira = Queue()
         self.uyaripen=[]
         self.gizli = 0
+        
         self.pencere = pencere_
+        global pencere_ana_
+        pencere_ana_ = self.pencere
         self.Acik = 1
         self.Acik_ = 1
         self.pencereler = []
@@ -109,7 +114,7 @@ class UYGULAMA(object):
         
         Thread(target=self.saat_yenile).start()
         
-        Thread(target=self.denetim).start()
+        #Thread(target=self.denetim).start()
         #Thread(target=self.uyari, args=("", "")).start()
         
         Thread(target=self.uyaridenetim).start()
@@ -123,11 +128,11 @@ class UYGULAMA(object):
     def guncellestirmeDenetim(self, komut=""):
         print "a"
         if komut != "":
-            showinfo(u"Güncelleþtirmeler Denetleniyor", u"Güncelleþtirmeler denetleniyor...")
+            showinfo(u"GÃ¼ncelleÅŸtirmeler Denetleniyor", u"GÃ¼ncelleÅŸtirmeler denetleniyor...")
 
         dosya = urllib.urlopen("https://raw.githubusercontent.com/millipardus/ezanvakitleri/master/surum.txt").read().strip()
         if dosya != self.surum and float(dosya) > float(self.surum):
-            soru = askquestion(u"Yeni Bir Sürüm Var !", u"Yeni bir sürüm tespit edildi. Sürüm numarasý: %s\nYüklemek ister misiniz ?" %dosya)
+            soru = askquestion(u"Yeni Bir SÃ¼rÃ¼m Var !", u"Yeni bir sÃ¼rÃ¼m tespit edildi. SÃ¼rÃ¼m numarasÄ±: %s\nYÃ¼klemek ister misiniz ?" %dosya)
             if soru == "yes":
                 if sys.argv[0].endswith(".py"):
                     os.startfile("guncellestir.py")
@@ -135,7 +140,7 @@ class UYGULAMA(object):
                     os.startfile("guncellestir.exe")
                 exit()
         elif komut != "":
-            showinfo(u"Yeni Sürüm Yok", u"Þu an güncel sürümü kullanýyorsunuz.")
+            showinfo(u"Yeni SÃ¼rÃ¼m Yok", u"Åžu an gÃ¼ncel sÃ¼rÃ¼mÃ¼ kullanÄ±yorsunuz.")
                 
                 
         if komut == "":
@@ -163,13 +168,13 @@ class UYGULAMA(object):
         
         self.cerceve = Frame(self.pencere, height=100)
         
-        self.komutlar.add_command(label="Vakitleri Çek ve Kaydet", command=self.vakitcek_d)
+        self.komutlar.add_command(label="Vakitleri Ã‡ek ve Kaydet", command=self.vakitcek_d)
         self.komutlar.add_command(label="Gizle", command=self.pencere_gizle)
-        self.komutlar.add_command(label=u"Güncelleþtirmeleri Denetle", command=lambda: Thread(target=self.guncellestirmeDenetim("komut")).start())
-        self.dosya.add_command(label=u"Çýkýþ", command=self.cikis)
-        self.ayarlar_.add_command(label=u"Seçenekler", command=self.Secenekler)
+        self.komutlar.add_command(label=u"GÃ¼ncelleÅŸtirmeleri Denetle", command=lambda: Thread(target=self.guncellestirmeDenetim("komut")).start())
+        self.dosya.add_command(label=u"Ã‡Ä±kÄ±ÅŸ", command=self.cikis)
+        self.ayarlar_.add_command(label=u"SeÃ§enekler", command=self.Secenekler)
         
-        self.etk1 = Label(text=u"Hoþgeldiniz !")
+        self.etk1 = Label(text=u"HoÅŸgeldiniz !")
         self.etk2 = Label(text=u"Tarih: %s" %self.tarihcek(), font=("Arial", 20))
         self.etk3 = Label(text=u"Saat: ", font=("Arial", 20))
         self.etk4 = Label(text=u"", font=("Arial", 20))
@@ -189,11 +194,11 @@ class UYGULAMA(object):
         self.t.column("aksam", width=100, anchor="center")
         self.t.column("yatsi", width=100, anchor="center")
         
-        self.t.heading("imsak", text=u"Ýmsak")
-        self.t.heading("ogle", text=u"Öðle")
-        self.t.heading("ikindi", text=u"Ýkindi")
-        self.t.heading("aksam", text=u"Akþam")
-        self.t.heading("yatsi", text=u"Yatsý")
+        self.t.heading("imsak", text=u"Ä°msak")
+        self.t.heading("ogle", text=u"Ã–ÄŸle")
+        self.t.heading("ikindi", text=u"Ä°kindi")
+        self.t.heading("aksam", text=u"AkÅŸam")
+        self.t.heading("yatsi", text=u"YatsÄ±")
         
         
         self.t["show"] = "headings"
@@ -233,7 +238,7 @@ class UYGULAMA(object):
             zd = datetime.strptime(s2, FMT) - datetime.strptime(s1, FMT)
             m, s = divmod(zd.seconds, 60)
             h,m = divmod(m,60)
-            self.etk4["text"] = u"Ýmsaða kalan zaman: %s" %(str(h)+":"+str(m)+":"+str(s))
+            self.etk4["text"] = u"Ä°msaÄŸa kalan zaman: %s" %(str(h)+":"+str(m)+":"+str(s))
         
         
         
@@ -244,7 +249,7 @@ class UYGULAMA(object):
         
         pencere = Toplevel()
         #pencere.geometry("500x500")
-        pencere.title("Seçenekler")
+        pencere.title("SeÃ§enekler")
         self.pencereler.append(pencere)
         
         self.o1 = IntVar()
@@ -264,10 +269,10 @@ class UYGULAMA(object):
                 if ('bip',) in veriler:
                     self.o2.set(1)
         
-        etk = Label(pencere, text=u"Ezan vakti geldiðinde;")
+        etk = Label(pencere, text=u"Ezan vakti geldiÄŸinde;")
         
         onay= Checkbutton(pencere, text=u"Ezan oku", variable=self.o1)
-        onay2=Checkbutton(pencere, text=u"Bip sesi çýkart", variable=self.o2)
+        onay2=Checkbutton(pencere, text=u"Bip sesi Ã§Ä±kart", variable=self.o2)
         dug = Button(pencere, text=u"Ayarla", command=lambda: self.Ayarla(pencere))
 
         
@@ -300,7 +305,7 @@ class UYGULAMA(object):
         
         self.ayarlar = ayarlar
         pencere.destroy()
-        showwarning(u"Seçenekler Kaydedildi", u"Seçenekler baþarýyla kaydedildi.")
+        showinfo(u"SeÃ§enekler Kaydedildi", u"SeÃ§enekler baÅŸarÄ±yla kaydedildi.")
     
     def denetim(self):
         print self.Acik
@@ -311,13 +316,13 @@ class UYGULAMA(object):
             if self.tarih_al != self.tarihcek():
                 self.tarih_al = self.tarihcek()
                 tarih = self.tarihcek()
-                #print "Tarih güncelleniyor."
-                showwarning("Tarih Güncellendi", "Tarih güncellendi: %s" %tarih)
+                #print "Tarih gÃ¼ncelleniyor."
+                showinfo("Tarih GÃ¼ncellendi", "Tarih gÃ¼ncellendi: %s" %tarih)
                 self.im.execute("UPDATE sontarih SET bilgi =?", (self.tarih_al,))
                 self.v.commit()
-                #print "Tarih güncellendi: %s" %tarih
+                #print "Tarih gÃ¼ncellendi: %s" %tarih
                 os.system("cls")
-                #print "Bugünün Tarihi: %s" %tarih
+                #print "BugÃ¼nÃ¼n Tarihi: %s" %tarih
                 self.vakitler = self.vakitcek_d()
             
             
@@ -330,11 +335,30 @@ class UYGULAMA(object):
             devam=0
             
         if devam:
-            self.pencere.after(1000, self.denetim)
+            print "devam. Åžimdi iÅŸlev tekrarlanacak."
+            self.pencere.after(10, self.denetim)
     
     def saat_yenile(self):
         while 1:
             if self.Acik:
+                if self.tarih_al != self.tarihcek():
+                    self.tarih_al = self.tarihcek()
+                    tarih = self.tarihcek()
+                    #print "Tarih gÃ¼ncelleniyor."
+                    showinfo("Tarih GÃ¼ncellendi", "Tarih gÃ¼ncellendi: %s" %tarih)
+                    self.im.execute("UPDATE sontarih SET bilgi =?", (self.tarih_al,))
+                    self.v.commit()
+                    #print "Tarih gÃ¼ncellendi: %s" %tarih
+                    os.system("cls")
+                    #print "BugÃ¼nÃ¼n Tarihi: %s" %tarih
+                    self.vakitler = self.vakitcek_d()
+            
+            
+                if self.saat != self.saatcek():
+                    self.saat = self.saatcek()
+                    self.vakitdenetle()
+                    #print self.saat
+                    
                 saat= self.saatcek("tam")
                 self.etk3["text"] = "Saat: %s" %saat
                 imsak_ = self.vakitler[0].split(':')
@@ -356,27 +380,34 @@ class UYGULAMA(object):
 
                 if simdi < imsak and simdi < ogle and simdi < ikindi and simdi < aksam and simdi < yatsi:
                     s1 = self.vakitler[0] + ":00"
-                    strvakit = u"Ýmsaða"
+                    strvakit = u"Ä°msaÄŸa"
+                    strdosya = "imsak"
+                    
                     
                 elif simdi > imsak and simdi < ogle and simdi < ikindi and simdi < aksam and simdi < yatsi:
                     s1 = self.vakitler[1] + ":00"
-                    strvakit = u"Öðleye"
+                    strvakit = u"Ã–ÄŸleye"
+                    strdosya = "ogle"
 
                 elif simdi > imsak and simdi > ogle and simdi < ikindi and simdi < aksam and simdi < yatsi:
                     s1 = self.vakitler[2] + ":00"
-                    strvakit = u"Ýkindiye"
+                    strvakit = u"Ä°kindiye"
+                    strdosya = "ikindi"
 
                 elif simdi > imsak and simdi > ogle and simdi > ikindi and simdi < aksam and simdi < yatsi:
                     s1 = self.vakitler[3] + ":00"
-                    strvakit = u"Akþama"
+                    strvakit = u"AkÅŸama"
+                    strdosya = "aksam"
 
                 elif simdi > imsak and simdi > ogle and simdi > ikindi and simdi > aksam and simdi < yatsi:
                     s1 = self.vakitler[4] + ":00"
-                    strvakit = u"Yatsýya"
+                    strvakit = u"YatsÄ±ya"
+                    strdosya = "yatsi"
                 
                 elif simdi > imsak and simdi > ogle and simdi > ikindi and simdi > aksam and simdi > yatsi:
                     s1 = self.vakitler[0] + ":00"
-                    strvakit = u"Ýmsaða"
+                    strvakit = u"Ä°msaÄŸa"
+                    strdosya = "imsak"
                 
                 
                 
@@ -394,19 +425,30 @@ class UYGULAMA(object):
                     kalanzaman = str(zd).replace("-1 day, ", "")
                     
                     if kalanzaman.split(':')[1] == "30" and self.dvc(str(datetime.now().hour)) == self.dvc(s1.split(':')[0]) and kalanzaman.split(':')[2] == "00":
-                        Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - Uyarý", u"%s 30 dakika kaldý !" %strvakit, "kaynaklar"+os.sep+"camii2.ico", "Ezan Vakti")).start()
+                        Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - UyarÄ±", u"%s 30 dakika kaldÄ± !" %strvakit, "kaynaklar"+os.sep+"camii2.ico", "Ezan Vakti")).start()
+                        self.sira.put(lambda: Thread(target=self.yonlendir, args=("kaynaklar"+os.sep+strdosya+"30dk.mp3",)).start())
+                        #self.sira.put(lambda: self.muzik_cal("kaynaklar"+os.sep+strdosya+"30dk.mp3"))
+                        
                     
                     if kalanzaman.split(':')[1] == "15" and self.dvc(str(datetime.now().hour)) == self.dvc(s1.split(':')[0]) and kalanzaman.split(':')[2] == "00":
-                        Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - Uyarý", u"%s 15 dakika kaldý !" %strvakit, "kaynaklar"+os.sep+"camii2.ico", "Ezan Vakti")).start()
+                        Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - UyarÄ±", u"%s 15 dakika kaldÄ± !" %strvakit, "kaynaklar"+os.sep+"camii2.ico", "Ezan Vakti")).start()
+                        #self.sira.put(lambda: self.muzik_cal("kaynaklar"+os.sep+strdosya+"15dk.mp3"))
+                        self.sira.put(lambda: Thread(target=self.yonlendir, args=("kaynaklar"+os.sep+strdosya+"15dk.mp3",)).start())
+                        
                     
                     if kalanzaman.split(':')[1] == "10" and self.dvc(str(datetime.now().hour)) == self.dvc(s1.split(':')[0]) and kalanzaman.split(':')[2] == "00":
-                        Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - Uyarý", u"%s 10 dakika kaldý !" %strvakit, "kaynaklar"+os.sep+"camii2.ico", "Ezan Vakti")).start()
-                    
+                        Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - UyarÄ±", u"%s 10 dakika kaldÄ± !" %strvakit, "kaynaklar"+os.sep+"camii2.ico", "Ezan Vakti")).start()
+                        #self.sira.put(lambda: self.muzik_cal("kaynaklar"+os.sep+strdosya+"10dk.mp3"))
+                        self.sira.put(lambda: Thread(target=self.yonlendir, args=("kaynaklar"+os.sep+strdosya+"10dk.mp3",)).start())
                     if kalanzaman == "0:05:00":
-                        Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - Uyarý", u"%s 5 dakika kaldý !" %strvakit, "kaynaklar"+os.sep+"camii2.ico", "Ezan Vakti")).start()
+                        Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - UyarÄ±", u"%s 5 dakika kaldÄ± !" %strvakit, "kaynaklar"+os.sep+"camii2.ico", "Ezan Vakti")).start()
+                        #self.sira.put(lambda: self.muzik_cal("kaynaklar"+os.sep+strdosya+"5dk.mp3"))
+                        self.sira.put(lambda: Thread(target=self.yonlendir, args=("kaynaklar"+os.sep+strdosya+"5dk.mp3",)).start())
                     
                     if kalanzaman.split(':')[0] == "1" and kalanzaman.split(':')[1] == "00" and kalanzaman.split(':')[2] == "00":
-                        Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - Uyarý", u"%s 1 saat kaldý !" %strvakit, "kaynaklar"+os.sep+"camii2.ico", "Ezan Vakti")).start()
+                        Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - UyarÄ±", u"%s 1 saat kaldÄ± !" %strvakit, "kaynaklar"+os.sep+"camii2.ico", "Ezan Vakti")).start()
+                        #self.sira.put(lambda: self.muzik_cal("kaynaklar"+os.sep+strdosya+"60dk.mp3"))
+                        self.sira.put(lambda: Thread(target=self.yonlendir, args=("kaynaklar"+os.sep+strdosya+"60.mp3",)).start())
                     
                     self.etk4["text"] = u"%s kalan zaman: %s" %(strvakit, kalanzaman)
                 except: pass
@@ -423,11 +465,20 @@ class UYGULAMA(object):
     def sil(self):
         self.etk1["text"] = ""
     
+    def muzik_cal(self, muzik):
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load(muzik)
+        pygame.mixer.music.play()
+    
     def ezan_cal(self):
+        self.sira.put(lambda: self.muzik_cal("kaynaklar"+os.sep+"ezan.mp3"))
         """pygame.mixer.music.load("ezan.mp3")
         pygame.mixer.music.play()
         self.pencere.after(60000, pygame.mixer.music.stop())"""
-        os.startfile("kaynaklar"+os.sep+"ezan.mp3")
+        #os.startfile("kaynaklar"+os.sep+"ezan.mp3")
+    
+    def yonlendir(self, muzik):
+        self.sira.put(lambda: self.muzik_cal(muzik))
 
     def uyaridenetim(self):
         while True:
@@ -450,7 +501,7 @@ class UYGULAMA(object):
         if devam:
             self.pencere.after(100, self.uyaridenetim)
     
-    def uyari(self, baslik, icerik):
+    def uyari(self, baslik, icerik, mp3=""):
         
         try:
             if self.ayarlar:
@@ -467,14 +518,16 @@ class UYGULAMA(object):
             else:
                 pass
         except:pass
+        print mp3
         
-        self.sira.put(lambda: showwarning(baslik, icerik))
+        self.sira.put(lambda: showinfo(baslik, icerik))
+        
         if self.gizli:
-            #print "öö"
+            #print "Ã¶Ã¶"
             self.sira.put(self.pencere.deiconify)
             #Thread(target=self.pencere.deiconify).start()
             self.gizli = 0
-        """self.uyaripen = (showwarning(baslik, icerik))
+        """self.uyaripen = (showinfo(baslik, icerik))
         self.uyaripen = ()
         Thread(target=self.uyar, args=(baslik, icerik)).start()"""
     
@@ -485,22 +538,45 @@ class UYGULAMA(object):
         saat = self.saatcek()
         print self.vakitler
         if saat == self.vakitler[0]:
-            Thread(target=self.uyari, args=(u"Ezan Vakti - Uyarý", u"Ýmsak Vakti !")).start()
-            Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - Uyarý", u"Ýmsak Vakti !", "camii2.ico", "Ezan Vakti")).start()
+            Thread(target=self.uyari, args=(u"Ezan Vakti - UyarÄ±", u"Ä°msak Vakti !","kaynaklar"+os.sep+"imsak.mp3")).start()
+            #self.sira.put(lambda: self.muzik_cal("kaynaklar"+os.sep+"imsak.mp3"))
+            self.sira.put(lambda: Thread(target=self.yonlendir, args=("kaynaklar"+os.sep+"imsak.mp3",)).start())
+            Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - UyarÄ±", u"Ä°msak Vakti !", "camii2.ico", "Ezan Vakti")).start()
+            
+            
+            
         elif saat == self.vakitler[1]:
-            Thread(target=self.uyari, args=(u"Ezan Vakti - Uyarý", u"Öðle Vakti !")).start()
-            Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - Uyarý", u"Öðle Vakti !", "camii2.ico", "Ezan Vakti")).start()
+            Thread(target=self.uyari, args=(u"Ezan Vakti - UyarÄ±", u"Ã–ÄŸle Vakti !", "kaynaklar"+os.sep+"ogle.mp3")).start()
+            #self.sira.put(lambda: self.muzik_cal("kaynaklar"+os.sep+"ogle.mp3"))
+            self.sira.put(lambda: Thread(target=self.yonlendir, args=("kaynaklar"+os.sep+"ogle.mp3",)).start())
+            Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - UyarÄ±", u"Ã–ÄŸle Vakti !", "camii2.ico", "Ezan Vakti")).start()
+            
+            
         elif saat == self.vakitler[2]:
-            Thread(target=self.uyari, args=(u"Ezan Vakti - Uyarý", u"Ýkindi Vakti !")).start()
-            Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - Uyarý", u"Ýkindi Vakti !", "camii2.ico", "Ezan Vakti")).start()
-        elif saat == self.vakitler[3]:
-            Thread(target=self.uyari, args=(u"Ezan Vakti - Uyarý", u"Akþam Vakti !")).start()
-            Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - Uyarý", u"Akþam Vakti !", "camii2.ico", "Ezan Vakti")).start()
-        elif saat == self.vakitler[4]:
-            Thread(target=self.uyari, args=(u"Ezan Vakti - Uyarý", u"Yatsý Vakti !")).start()
-            Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - Uyarý", u"Yatsý Vakti !", "camii2.ico", "Ezan Vakti")).start()
-        
+            Thread(target=self.uyari, args=(u"Ezan Vakti - UyarÄ±", u"Ä°kindi Vakti !", "kaynaklar"+os.sep+"ikindi.mp3")).start()
+            #self.sira.put(lambda: self.muzik_cal("kaynaklar"+os.sep+"ikindi.mp3"))
+            self.sira.put(lambda: Thread(target=self.yonlendir, args=("kaynaklar"+os.sepa+"ikindi.mp3",)).start())
+            Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - UyarÄ±", u"Ä°kindi Vakti !", "camii2.ico", "Ezan Vakti")).start()
+            
+            
 
+            
+        elif saat == self.vakitler[3]:
+            Thread(target=self.uyari, args=(u"Ezan Vakti - UyarÄ±", u"AkÅŸam Vakti !", "kaynaklar"+os.sep+"aksam.mp3")).start()
+            #self.sira.put(lambda: self.muzik_cal("kaynaklar"+os.sep+"aksam.mp3"))
+            self.sira.put(lambda: Thread(target=self.yonlendir, args=("kaynaklar"+os.sep+"aksam.mp3",)).start())
+            Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - UyarÄ±", u"AkÅŸam Vakti !", "camii2.ico", "Ezan Vakti")).start()
+            
+
+            
+        elif saat == self.vakitler[4]:
+            Thread(target=self.uyari, args=(u"Ezan Vakti - UyarÄ±", u"YatsÄ± Vakti !", "kaynaklar"+os.sep+"yatsi.mp3")).start()
+            #self.sira.put(lambda: self.muzik_cal("kaynaklar"+os.sep+"yatsi.mp3"))
+            self.sira.put(lambda: Thread(target=self.yonlendir, args=("kaynaklar"+os.sep+"yatsi.mp3",)).start())
+            Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - UyarÄ±", u"YatsÄ± Vakti !", "camii2.ico", "Ezan Vakti")).start()
+            
+
+            
     def baslangic_denetim(self):
         imsak_ = self.vakitler[0].split(':')
         ogle_ = self.vakitler[1].split(':')
@@ -522,26 +598,26 @@ class UYGULAMA(object):
 
         if simdi < imsak and simdi < ogle and simdi < ikindi and simdi < aksam and simdi < yatsi:
             s1 = self.vakitler[0] + ":00"
-            strvakit = u"Ýmsaða"            
+            strvakit = u"Ä°msaÄŸa"            
         elif simdi > imsak and simdi < ogle and simdi < ikindi and simdi < aksam and simdi < yatsi:
             s1 = self.vakitler[1] + ":00"
-            strvakit = u"Öðleye"
+            strvakit = u"Ã–ÄŸleye"
 
         elif simdi > imsak and simdi > ogle and simdi < ikindi and simdi < aksam and simdi < yatsi:
             s1 = self.vakitler[2] + ":00"
-            strvakit = u"Ýindiye"
+            strvakit = u"Ä°indiye"
 
         elif simdi > imsak and simdi > ogle and simdi > ikindi and simdi < aksam and simdi < yatsi:
             s1 = self.vakitler[3] + ":00"
-            strvakit = u"Akþama"
+            strvakit = u"AkÅŸama"
 
         elif simdi > imsak and simdi > ogle and simdi > ikindi and simdi > aksam and simdi < yatsi:
             s1 = self.vakitler[4] + ":00"
-            strvakit = u"Yatsýya"
+            strvakit = u"YatsÄ±ya"
         
         elif simdi > imsak and simdi > ogle and simdi > ikindi and simdi > aksam and simdi > yatsi:
             s1 = self.vakitler[0] + ":00"
-            strvakit = u"Ýmsaða"
+            strvakit = u"Ä°msaÄŸa"
         
         
         
@@ -557,19 +633,19 @@ class UYGULAMA(object):
         kalanzaman = str(zd).replace("-1 day, ", "")
         
         if (kalanzaman.split(':')[1] == "29") and self.dvc(str(datetime.now().hour)) == self.dvc(s1.split(':')[0]):
-            Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - Uyarý", u"%s 30 dakika kaldý !" %strvakit, "kaynaklar"+os.sep+"camii2.ico", "Ezan Vakti")).start()
+            Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - UyarÄ±", u"%s 30 dakika kaldÄ± !" %strvakit, "kaynaklar"+os.sep+"camii2.ico", "Ezan Vakti")).start()
         
         if (kalanzaman.split(':')[1] == "14") and self.dvc(str(datetime.now().hour)) == self.dvc(s1.split(':')[0]):
-            Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - Uyarý", u"%s 15 dakika kaldý !" %strvakit, "kaynaklar"+os.sep+"camii2.ico", "Ezan Vakti")).start()
+            Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - UyarÄ±", u"%s 15 dakika kaldÄ± !" %strvakit, "kaynaklar"+os.sep+"camii2.ico", "Ezan Vakti")).start()
         
         if (kalanzaman.split(':')[1] == "09") and self.dvc(str(datetime.now().hour)) == self.dvc(s1.split(':')[0]):
-            Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - Uyarý", u"%s 10 dakika kaldý !" %strvakit, "kaynaklar"+os.sep+"camii2.ico", "Ezan Vakti")).start()
+            Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - UyarÄ±", u"%s 10 dakika kaldÄ± !" %strvakit, "kaynaklar"+os.sep+"camii2.ico", "Ezan Vakti")).start()
         
         if (kalanzaman.split(':')[1] == "04") and self.dvc(str(datetime.now().hour)) == self.dvc(s1.split(':')[0]):
-            Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - Uyarý", u"%s 5 dakika kaldý !" %strvakit, "kaynaklar"+os.sep+"camii2.ico", "Ezan Vakti")).start()
+            Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - UyarÄ±", u"%s 5 dakika kaldÄ± !" %strvakit, "kaynaklar"+os.sep+"camii2.ico", "Ezan Vakti")).start()
         
         if kalanzaman.split(':')[0] == "0" and kalanzaman.split(':')[1] == "59":
-            Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - Uyarý", u"%s 1 saat kaldý !" %strvakit, "kaynaklar"+os.sep+"camii2.ico", "Ezan Vakti")).start()
+            Thread(target=bildirim.bildiri, args=(u"Ezan Vakti - UyarÄ±", u"%s 1 saat kaldÄ± !" %strvakit, "kaynaklar"+os.sep+"camii2.ico", "Ezan Vakti")).start()
         
         self.etk4["text"] = u"%s kalan zaman: %s" %(strvakit, kalanzaman)
         
@@ -601,7 +677,7 @@ class UYGULAMA(object):
     
     
     def vakitcek(self, komut=None):
-        showwarning(u"Vakitler Ayarlanýyor", u"Vakitler çekiliyor.")
+        showinfo(u"Vakitler AyarlanÄ±yor", u"Vakitler Ã§ekiliyor.")
 
         kodlar = urllib.urlopen("http://www.diyanet.gov.tr/tr/namazvakitleri").read()
         
@@ -648,7 +724,7 @@ class UYGULAMA(object):
         veriler = self.vakitcek("duzenle")
         self.liste_temizle()
         self.t.insert("", 0, values=(veriler[0], veriler[1], veriler[2], veriler[3], veriler[4]))
-        showwarning(u"Vakitler Ayarlandý", u"Vakitler baþarýyla ayarlandý.")
+        showinfo(u"Vakitler AyarlandÄ±", u"Vakitler baÅŸarÄ±yla ayarlandÄ±.")
         return veriler
     
     def cikis(self):
@@ -665,9 +741,48 @@ class Veritabani(object):
         im.execute("SELECT * FROM %s" %tablo)
         veriler = im.fetchall()
         return veriler
+
+IPUCU = 'wx Sistem Cubugu'
+RESIM = "kaynaklar"+os.sep+'camii.png'
+        
+class GCResim(wx.TaskBarIcon):
+    def __init__(self):
+        
+        super(GCResim, self).__init__()
+        
+        resim = wx.IconFromBitmap(wx.Bitmap(RESIM))
+        self.SetIcon(resim)
+
+        self.Bind(wx.EVT_TASKBAR_LEFT_DOWN, self.SOL_TIKLAYINCA)
+    
+    def CreatePopupMenu(self):
+        menu = wx.Menu()
+        self.olustur(menu, u'Ã‡Ä±kÄ±ÅŸ', self.cikis)
+        return menu
+    
+    def olustur(self, menu, etiket, islev):
+        nesne = wx.MenuItem(menu, -1, etiket)
+        menu.Bind(wx.EVT_MENU, islev, id=nesne.GetId())
+        menu.AppendItem(nesne)
+        return nesne
+    
+    def SOL_TIKLAYINCA(self, olay):
+        print "ae"
+        global pencere_ana_
+        #if self.gizli:
+        #    print "evet"
+        pencere_ana_.deiconify()
+    def cikis(self, olay):
+        sys.exit()
         
         
 if __name__ == "__main__":
+    global pencere_
     pencere_ = Tk()
     u = UYGULAMA(pencere_)
+    
+    uyg = wx.App()
+    GCR = GCResim()
+    #uyg.MainLoop()
     pencere_.mainloop()
+    
