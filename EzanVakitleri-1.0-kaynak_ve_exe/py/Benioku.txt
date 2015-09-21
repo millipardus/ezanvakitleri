@@ -1,0 +1,2 @@
+Programý açmak için 'EzanVakitleri.py' dosyasýný çalýþtýrýn.
+'kaynaklar' dizini .py dosyalarý ile ayný yerde bulunmalýdýr.
