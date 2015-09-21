@@ -1,3 +1,0 @@
-Programý doðrudan çalýþtýrmak için 'Ezan Vakitleri.exe' dosyasýný çalýþtýrýn.
-Programý kurmak için 'ezanvakitleri-1.0-kurulum.exe' dosyasýný çalýþtýrýn.
-'kaynaklar' dizini çalýþtýrýlabilir dosya ile ayný yerde bulunmalýdýr.

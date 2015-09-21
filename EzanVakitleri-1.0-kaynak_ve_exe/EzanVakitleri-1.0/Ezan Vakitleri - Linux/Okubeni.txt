@@ -1,3 +1,0 @@
-Çalýþtýrmak için programýn bulunduðu dizinde uçbirimi açýp þu komutu verin:
-./EzanVakitleri
-'kaynaklar' dizini çalýþtýrýlabilir dosya ile ayný yerde bulunmalýdýr.
